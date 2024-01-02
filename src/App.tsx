@@ -1,8 +1,11 @@
 import { Button, Collapse, Flex, Form, Input, Modal } from "antd";
 import "./App.css";
 import { useSolana } from "./hooks";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "antd/es/form/Form";
+import { useWallet } from "@solana/wallet-adapter-react";
+import { truncateBetween } from "./utils";
+import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 
 type Wallet = {
   address: string;
@@ -101,11 +104,7 @@ function App() {
   const dataWalletCollapseItems = useMemo(() => {
     return wallets.map(({ address, tokens }, index) => ({
       key: address,
-      label: `Wallet ${index + 1} 
-        (${address.slice(0, 4)}...${address.slice(
-        address.length - 4,
-        address.length
-      )})`,
+      label: `Wallet ${index + 1} (${truncateBetween(address)})`,
       style: { color: "white" },
       children: (
         <Flex vertical gap={16}>
@@ -146,6 +145,40 @@ function App() {
   const [isImportModalOpen, setImportModalOpen] = useState(false);
 
   const [form] = useForm();
+  const { wallet, connected, disconnect } = useWallet();
+  useEffect(() => {
+    async function fetchWalletTokenInfo() {
+      const pubKey = wallet?.adapter?.publicKey?.toString() as string;
+
+      const tokens: TokenInfo[] = await getAllTokenAccountByOwner(pubKey);
+      const balance = await getAccountBalance(pubKey);
+
+      const walletTokenInfo = {
+        address: pubKey,
+        tokens: [
+          {
+            mint: "11111111111111111111111111111111",
+            tokenAmount: {
+              uiAmount: balance,
+              uiAmountString: balance.toString(),
+            },
+            ...getTokenInfo("11111111111111111111111111111111"),
+          },
+          ...tokens.map((token) => {
+            return { ...token, ...getTokenInfo(token.mint) };
+          }),
+        ],
+      } as Wallet;
+
+      setWallets([walletTokenInfo]);
+    }
+
+    if (connected) {
+      fetchWalletTokenInfo();
+    } else {
+      setWallets([]);
+    }
+  }, [connected]);
 
   return (
     <>
@@ -155,6 +188,8 @@ function App() {
         <button onClick={() => setImportModalOpen(true)}>
           Import Wallet from pass phrase
         </button>
+
+        <WalletMultiButton />
       </Flex>
 
       {wallets.length > 0 && (

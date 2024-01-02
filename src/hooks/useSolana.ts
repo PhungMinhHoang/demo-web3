@@ -16,12 +16,10 @@ import base58 from "bs58";
 
 import { ACCOUNT_PRIVATE_KEY } from "../constant";
 import tokenInfos from "../tokens.json";
+import { useConnection } from "@solana/wallet-adapter-react";
 
 export const useSolana = () => {
-  //const connectUrl = clusterApiUrl("mainnet-beta");
-  const connectUrl =
-    "https://boldest-convincing-yard.solana-mainnet.quiknode.pro/";
-  const connection = new Connection(connectUrl, "confirmed");
+  const { connection } = useConnection();
 
   const createAccount = async () => {
     /** The account that will transfer lamports to the created account */
@@ -71,8 +69,6 @@ export const useSolana = () => {
     //   [fromKeyPair, newAccountKeyPair]
     // );
 
-    console.log(passPhrase);
-
     return {
       secretKey: base58.encode(newAccountKeyPair.secretKey),
       passPhrase,
@@ -116,15 +112,13 @@ export const useSolana = () => {
     const owner = new PublicKey(pubKey);
     const tokenAccounts = [];
 
-    let response = await connection.getParsedTokenAccountsByOwner(owner, {
+    const response = await connection.getParsedTokenAccountsByOwner(owner, {
       programId: TOKEN_PROGRAM_ID,
     });
 
     for (let index = 0; index < response.value.length; index++) {
       const accountInfo = response.value[index].account.data.parsed.info;
       tokenAccounts.push(accountInfo);
-
-      console.log(accountInfo);
     }
 
     return tokenAccounts;
