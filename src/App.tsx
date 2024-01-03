@@ -209,7 +209,7 @@ function App() {
 
       <h3>Limit Order</h3>
 
-      <LimitOrder />
+      <LimitOrder tokens={wallets[0]?.tokens}/>
 
       <Modal
         title="Create account successfully"

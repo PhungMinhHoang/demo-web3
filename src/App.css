@@ -42,10 +42,10 @@
 }
 
 .ant-collapse-header-text {
-  color: white !important;
+  /* color: white !important; */
 }
 
 .ant-collapse-content-box {
-  background: #242424 !important;
-  color: wheat !important;
+  /* background: #242424 !important;
+  color: wheat !important; */
 }
