@@ -1,4 +1,4 @@
-import { Button, Collapse, Flex, Form, Input, Modal } from "antd";
+import { Button, Collapse, Flex, Form, Input, Modal, Divider } from "antd";
 import "./App.css";
 import { useSolana } from "./hooks";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -6,6 +6,7 @@ import { useForm } from "antd/es/form/Form";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { truncateBetween } from "./utils";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
+import { LimitOrder } from "./components/LimitOrder";
 
 type Wallet = {
   address: string;
@@ -203,6 +204,12 @@ function App() {
           ></Collapse>
         </>
       )}
+
+      <Divider />
+
+      <h3>Limit Order</h3>
+
+      <LimitOrder />
 
       <Modal
         title="Create account successfully"
